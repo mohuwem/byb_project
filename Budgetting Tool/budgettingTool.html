@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budgeting Tool</title>
+</head>
+<body>
+    <h1 style="text-align: center;">Budgeting Website</h1>
+
+    <h2>Income</h2>
+    <ul id="incomeList"></ul>
+    <button onclick="addIncome()">Add Income</button>
+
+    <h2>Expenses</h2>
+    <ul id="expenseList"></ul>
+    <button onclick="addExpense()">Add Expense</button>
+
+    <button onclick="makeSavings()">Make Savings</button>
+
+    <ul id="savingsList"></ul>
+
+    <script>
+        // Initialize income and expenses from session storage or set default values
+        let incomeList = JSON.parse(sessionStorage.getItem('incomeList')) || [
+            { name: "Job", amount: 4000, recurring: true },
+            { name: "Freelance Work", amount: 1000, recurring: false },
+            { name: "Investment", amount: 500, recurring: true },
+            { name: "Side Gig", amount: 300, recurring: false },
+            { name: "Gift", amount: 200, recurring: false }
+        ];
+        let expenseList = JSON.parse(sessionStorage.getItem('expenseList')) || [
+            { name: "Groceries", amount: 350, recurring: true },
+            { name: "Rent", amount: 1000, recurring: true },
+            { name: "Utilities", amount: 200, recurring: true },
+            { name: "Entertainment", amount: 150, recurring: false },
+            { name: "Transportation", amount: 100, recurring: true }
+        ];
+
+        // Function to display income items in list
+        function displayIncomeList() {
+            const incomeListElement = document.getElementById('incomeList');
+            incomeListElement.innerHTML = '';
+            incomeList.forEach(income => {
+                const li = document.createElement('li');
+                li.textContent = `${income.name}: £${income.amount.toFixed(2)}`;
+                incomeListElement.appendChild(li);
+            });
+        }
+
+        // Function to display expense items in list
+        function displayExpenseList() {
+            const expenseListElement = document.getElementById('expenseList');
+            expenseListElement.innerHTML = '';
+            expenseList.forEach(expense => {
+                const li = document.createElement('li');
+                li.textContent = `${expense.name}: £${expense.amount.toFixed(2)}`;
+                expenseListElement.appendChild(li);
+            });
+        }
+
+        // Function to add income
+        function addIncome() {
+            const name = prompt("Enter the name of the new income source:");
+            const amount = parseFloat(prompt(`Enter the amount for ${name}:`));
+            const recurring = confirm("Is this income recurring? Click OK for yes, Cancel for no.");
+            incomeList.push({ name, amount, recurring });
+            sessionStorage.setItem('incomeList', JSON.stringify(incomeList));
+            displayIncomeList();
+        }
+
+        // Function to add expense
+        function addExpense() {
+            const name = prompt("Enter the name of the new expense item:");
+            const amount = parseFloat(prompt(`Enter the amount for ${name}:`));
+            const recurring = confirm("Is this expense recurring? Click OK for yes, Cancel for no.");
+            expenseList.push({ name, amount, recurring });
+            sessionStorage.setItem('expenseList', JSON.stringify(expenseList));
+            displayExpenseList();
+        }
+
+        // Function to calculate total income
+        function calculateTotalIncome() {
+            return incomeList.reduce((total, income) => total + income.amount, 0);
+        }
+
+        // Function to calculate total expenses
+        function calculateTotalExpenses() {
+            return expenseList.reduce((total, expense) => total + expense.amount, 0);
+        }
+
+        // Function to calculate disposable income
+        function calculateDisposableIncome() {
+            return calculateTotalIncome() - calculateTotalExpenses();
+        }
+
+        // Function to make savings
+        function makeSavings() {
+            const disposableIncome = calculateDisposableIncome();
+            const savingsAmount = parseFloat(prompt(`Your disposable income is £${disposableIncome.toFixed(2)}.\nHow much would you like to put into savings?`));
+            const remainingIncome = disposableIncome - savingsAmount;
+            const savingsListElement = document.getElementById('savingsList');
+            savingsListElement.innerHTML = '';
+            const li = document.createElement('li');
+            li.textContent = `Disposable Income: £${disposableIncome.toFixed(2)}, Saved Amount: £${savingsAmount.toFixed(2)}, Remaining Income: £${remainingIncome.toFixed(2)}`;
+            savingsListElement.appendChild(li);
+        }
+
+        // Initial display of income and expenses
+        displayIncomeList();
+        displayExpenseList();
+    </script>
+</body>
+</html>
